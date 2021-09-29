@@ -40,3 +40,18 @@
 >   res.json(<data_array>)
 > })
 
+#### Place the id of another collection on yours to create an ownership
+> <custom_field>: {
+>     type: Schema.Types.ObjectId,
+>     ref: '<model_name>',
+>   }
+
+#### Create an array of id's to make several documents belong to one
+> <custom_field>: [{
+>     type: Schema.Types.ObjectId,
+>     ref: '<model_name>'
+>   }]
+
+#### Run the populate method to replace the id's in an association field with the actual data
+> Model.find({}).populate('<custom_field>')
+

@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const { Item } = require('../models')
+const { Item, User } = require('../models')
 
 // router.get('/items', (req, res) => {
 //   Item.find({})
@@ -8,7 +8,7 @@ const { Item } = require('../models')
 // })
 
 router.get('/items', async function (req, res) {
-  const items = await Item.find({})
+  const items = await Item.find({}).populate('user')
   res.json(items)
 })
 
@@ -20,6 +20,7 @@ router.get('/items', async function (req, res) {
 
 router.post('/items', async function (req, res) {
   const item = await Item.create(req.body)
+  await User.findByIdAndUpdate(req.body.user, { $push: { items: item._id } })
   res.json(item)
 })
 
