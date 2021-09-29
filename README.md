@@ -16,6 +16,12 @@
 #### Use Async/Await logic to write a function that connects your NodeJS to your MongoDB
 > async function syncDB() { await mongoose.connect('mongodb://localhost:27017/<db_name>') }
 
+#### Create a Schema to define the fields on the document (like columns on a row)
+> const MyModel = new Schema({ <new_field>: <data_type> })
+
+#### Instantiate within your database by assigning that Schema as a Model within your database
+> model('ModelName', MyModel)
+
 #### Use the find() method to return documents from MongoDB
 > Model.find({ ...conditions })
 
