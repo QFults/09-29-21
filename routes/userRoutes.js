@@ -1,23 +1,32 @@
 const router = require('express').Router()
 const { User } = require('../models')
+const passport = require('passport')
+const jwt = require('jsonwebtoken')
 
-router.get('/users/:id', async function (req, res) {
-  const user = await User.findById(req.params.id).populate('items')
-  res.json(user)
+router.get('/user', passport.authenticate('jwt'), (req, res) => res.json(req.user))
+
+router.post('/users/register', (req, res) => {
+  const { name, username } = req.body
+  User.register(new User({ name, username }), req.body.password, err => {
+    if (err) { console.log(err) }
+    res.sendStatus(200)
+  })
 })
 
-router.post('/users', async function (req, res) {
-  const user = await User.create(req.body)
-  res.json(user)
+router.post('/users/login', (req, res) => {
+  User.authenticate()(req.body.username, req.body.password, (err, user) => {
+    if (err) { console.log(err) }
+    res.json(user ? jwt.sign({ id: user._id }, process.env.SECRET) : null)
+  })
 })
 
-router.put('/users/:id', async function (req, res) {
-  await User.findByIdAndUpdate(req.params.id, { $set: req.body })
+router.put('/users', passport.authenticate('jwt'), async function (req, res) {
+  await User.findByIdAndUpdate(req.user._id, { $set: req.body })
   res.sendStatus(200)
 })
 
-router.delete('/users/:id', async function (req, res) {
-  await User.findByIdAndDelete(req.params.id)
+router.delete('/users', async function (req, res) {
+  await User.findByIdAndDelete(req.user._id)
   res.sendStatus(200)
 })
 
