@@ -7,11 +7,71 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="An app for keeping track of items on a To-Do List">
   <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/todo_icon.png">
   <title>Document</title>
 </head>
 
 <body>
-  <h1>Hello World!</h1>
+  <form>
+    <p>
+      <label for="text">Item</label>
+      <input type="text" name="text" id="text">
+    </p>
+    <p>
+      <button id="addItem">Add Item</button>
+    </p>
+  </form>
+  <ul id="items"></ul>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(reg => console.log('Service Worker registered', reg))
+      })
+    }
+
+    axios.get('/api/user', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+      .then(({ data: user }) => {
+        user.items.forEach(item => {
+          let itemElem = document.createElement('li')
+          itemElem.innerHTML = `
+            <p>${item.text}</p>
+            </p>${item.isDone ? 'Done' : 'Not Done'}</p>
+          `
+          document.getElementById('items').append(itemElem)
+        })
+      })
+
+    document.getElementById('addItem').addEventListener('click', event => {
+      event.preventDefault()
+
+      let item = {
+        text: document.getElementById('text').value,
+        isDone: false,
+      }
+
+      axios.post('/api/items', item, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+        .then(({ data }) => {
+          let itemElem = document.createElement('li')
+          itemElem.innerHTML = `
+          <p>${item.text}</p>
+          </p>${item.isDone ? 'Done' : 'Not Done'}</p>
+          `
+          document.getElementById('items').append(itemElem)
+        })
+    })
+
+  </script>
 </body>
 
 </html>
