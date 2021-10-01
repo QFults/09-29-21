@@ -23,6 +23,7 @@
   </form>
   <ul id="items"></ul>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="./db.js"></script>
   <script>
 
     if ('serviceWorker' in navigator) {
@@ -62,6 +63,16 @@
         }
       })
         .then(({ data }) => {
+          let itemElem = document.createElement('li')
+          itemElem.innerHTML = `
+          <p>${item.text}</p>
+          </p>${item.isDone ? 'Done' : 'Not Done'}</p>
+          `
+          document.getElementById('items').append(itemElem)
+        })
+        .catch(err => {
+          console.error(err)
+          saveRecord(item)
           let itemElem = document.createElement('li')
           itemElem.innerHTML = `
           <p>${item.text}</p>
